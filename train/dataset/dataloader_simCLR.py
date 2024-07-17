@@ -244,7 +244,7 @@ class InssepDataset(WSIDataset):
         self.tiles = []
         if next(iter(self.pseudo_label)).startswith('/'):
             for k, vs in self.bag2tiles.items():
-                self.pseudo_label[k.strip('/')] = self.pseudo_label.pop(k.rstrip(('/')))
+                self.pseudo_label[k.strip('/')] = self.pseudo_label.pop(k.strip(('/')))
         if self.posbag == True:
             for k, vs in self.bag2tiles.items():
                 if "pos" in k:
@@ -361,7 +361,7 @@ class InssepSPLDataset(WSIDataset):
         self.instance_confidence = []
         if next(iter(self.pseudo_label)).startswith('/'):
             for k, vs in self.bag2tiles.items():
-                self.pseudo_label[k.strip('/')] = self.pseudo_label.pop(k.rstrip(('/')))
+                self.pseudo_label[k.strip('/')] = self.pseudo_label.pop(k.strip(('/')))
         if self.posbag == True:
             for k, vs in self.bag2tiles.items():
                 if "pos" in k:
@@ -422,7 +422,7 @@ class InssepSPLDataset(WSIDataset):
 
         if next(iter(self.pseudo_label)).startswith('/'):
             for k, vs in self.bag2tiles.items():
-                self.pseudo_label[k.strip('/')] = self.pseudo_label.pop(k.rstrip(('/')))
+                self.pseudo_label[k.strip('/')] = self.pseudo_label.pop(k.strip(('/')))
 
         for slide_name in self.pseudo_label.keys():
             for patch_name in self.pseudo_label[slide_name].keys():
@@ -469,16 +469,16 @@ class InssepSPLDataset(WSIDataset):
         patch_name = file_list[1]  # 24_181
 
         if self.pseudo_label:
-            pseudo_label = self.pseudo_label[slide_name][patch_name]
+            pseudo_label = self.pseudo_label[slide_name.strip('/')][patch_name]
             # print(pseudo_label)
             if pseudo_label > self.threshold and label == 1:
                 label = 1
             else:
                 label = 0
-        print("get item")
+        # print("get item")
         if self.train_stat:
             return img1, img2, torch.LongTensor(np.array([bag_label])), torch.LongTensor(
-                np.array([label])), torch.LongTensor([self.gt_label[slide_name][patch_name]]), slide_name, patch_name
+                np.array([label])), torch.LongTensor([self.gt_label[slide_name.strip('/')][patch_name]]), slide_name, patch_name
         else:
             return img1, torch.LongTensor(np.array([bag_label])), torch.LongTensor(np.array([label])), torch.LongTensor(
                 [self.gt_label[slide_name][patch_name]]), slide_name, patch_name

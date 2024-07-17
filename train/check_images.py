@@ -17,8 +17,18 @@ def check_and_copy_images(source_folder, destination_folder):
             else:
                 print("文件不存在")
             try:
+                # image = cv2.imread(file_path)
                 image = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
-                print("image:", image)
+
+                # cv2.imshow('Gray Image', image)
+                # # 显示
+                # cv2.namedWindow('findCorners', 0)
+                # cv2.resizeWindow('findCorners', 700, 900)  # 自己设定窗口图片的大小
+                # cv2.imshow("findCorners", image)
+                # cv2.waitKey(0)
+                # cv2.destroyAllWindows()
+
+                # print("image:", image)
                 if image is not None:
                     print("succeed")
                     Image.fromarray(image)
@@ -29,6 +39,6 @@ def check_and_copy_images(source_folder, destination_folder):
                 print(f"无法打开或处理 {file_path} ，错误信息: {e}")
 
 if __name__ == '__main__':
-    folder_path = r"E:/Desktop Files/Work/高测股份/Q-091-20240215-6"
-    dest_path = r"E:/Desktop Files/Work/高测股份/checked dataset"
+    folder_path = r"E:\files\basic information\Q-091-20240215-6"
+    dest_path = r"E:\Projects\ItS2CLR-local\base_dataset"
     check_and_copy_images(folder_path, dest_path)

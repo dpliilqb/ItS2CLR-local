@@ -180,8 +180,8 @@ if __name__ == '__main__':
     test_ratio = 0.2
     val_ratio = 0.1
 
-    folder_path = r"E:/Desktop Files/Work/高测股份/Q-091-20240215-6"
-    dest_path = r"E:/Desktop Files/Work/高测股份/dataset"
+    folder_path = r"../base_dataset"
+    dest_path = r"E:\files\basic information\Q-091-20240215-6\dataset"
 
     split_images(folder_path, dest_path, pos_rate=pos_rate, images_per_split=images_per_split)
 

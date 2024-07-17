@@ -90,8 +90,8 @@ class WSIDataset(Dataset):
         # print("start to get data")
         # image = cv2.imread(src, cv2.COLOR_BGR2GRAY)
         image = cv2.imread(src)
-        print("Original image shape:", image.shape)
-        print("Original image dtype:", image.dtype)
+        # print("Original image shape:", image.shape)
+        # print("Original image dtype:", image.dtype)
 
         # print("load cv2 successfully")
         # print("image:", image)
@@ -108,11 +108,11 @@ class WSIDataset(Dataset):
         # print("image:", image)
         # print("image.shape:", image.shape)
 
-        print("Final image shape:", image.shape)
-        print("Final image dtype:", image.dtype)
-        print("Image name:", src)
+        # print("Final image shape:", image.shape)
+        # print("Final image dtype:", image.dtype)
+        # print("Image name:", src)
         image = Image.fromarray(image)
-        print("get_data successfully")
+        # print("get_data successfully")
         return image
 
 class SSLDataset(WSIDataset):

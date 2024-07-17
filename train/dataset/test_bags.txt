@@ -1,0 +1,17 @@
+/testing/neg_30/
+/testing/neg_47/
+/testing/neg_36/
+/testing/neg_18/
+/testing/neg_46/
+/testing/neg_43/
+/testing/neg_14/
+/testing/neg_60/
+/testing/neg_54/
+/testing/neg_34/
+/testing/neg_63/
+/testing/neg_20/
+/testing/neg_55/
+/testing/neg_66/
+/testing/pos_8/
+/testing/pos_14/
+/testing/pos_9/

@@ -1,4 +1,4 @@
-batch_size: 2
+batch_size: 10
 epochs: 12
 eval_every_n_epochs: 5
 fine_tune_from: ''

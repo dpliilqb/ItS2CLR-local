@@ -231,7 +231,6 @@ class SimCLR(object):
 
         return loss
 
-
     #训练MIL aggregator，更新实例级伪标签
     def train_MIL(self, root, epoch_count, args):
         """The function to train the MIL modules"""
@@ -419,7 +418,6 @@ class SimCLR(object):
             np.argmax(2 * recall * precision / (recall + precision + 0.0000000001))], np.max(
             2 * recall * precision / (recall + precision + 0.0000000001))
 
-
     #得到feature
     def extract_feature(self, state_dict_path, args):
         """The function to extract the feature representation."""
@@ -531,6 +529,22 @@ class SimCLR(object):
         for epoch_counter in range(self.config['epochs']):
             print("Epoch {}/{}, main train".format(epoch_counter, self.config['epochs']))
             pos_dataloader_iterator = iter(self.train_loader_pos_full)
+            # print(len(self.train_loader_pos_full.dataset))
+            # print(pos_dataloader_iterator.__next__())
+            # sample_index = 0
+            # try:
+            #     sample = self.train_loader_pos_full.dataset[sample_index]
+            #     print(f"Sample at index {sample_index}: {sample}")
+            # except Exception as e:
+            #     print(f"Error fetching sample at index {sample_index}: {e}")
+            #     raise
+            # try:
+            #     for _ in range(3):  # 尝试获取前三个批次的数据
+            #         batch = next(pos_dataloader_iterator)
+            #         print(f"Batch: {batch}")
+            # except StopIteration:
+            #     print("StopIteration encountered during manual iteration")
+            #     raise
             pos_dataloader_iterator_filtered = iter(self.train_loader_pos)
             neg_dataloader_iterator_augmented = iter(self.train_loader_neg)
 
@@ -542,6 +556,14 @@ class SimCLR(object):
                     pos_dataloader_iterator = iter(self.train_loader_pos_full)
                     xis_pos, xjs_pos, bag_label_pos, label_pos, gt_label_pos, slide_name_pos, patch_name_pos = next(
                         pos_dataloader_iterator)
+                    # print("Reinitializing pos_dataloader_iterator...")
+                    # pos_dataloader_iterator = iter(self.train_loader_pos_full)
+                    # try:
+                    #     xis_pos, xjs_pos, bag_label_pos, label_pos, gt_label_pos, slide_name_pos, patch_name_pos = next(
+                    #         pos_dataloader_iterator)
+                    # except StopIteration:
+                    #     print("Failed to reinitialize pos_dataloader_iterator")
+                    #     raise  # 重新抛出异常以进行进一步的调试
 
                 xis_neg = xis
                 xjs_neg = xjs

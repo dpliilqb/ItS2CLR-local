@@ -186,10 +186,10 @@ class InsDataset(WSIDataset):
         file_list = temp_path.split('.')[0]
         file_list = file_list.split('/')[-2:]
 
-        if 'train' in tile_dir:
-            slide_name = "/training/" + file_list[0]  # normal_001
+        if 'val' in tile_dir:
+            slide_name = "val/" + file_list[0]  # normal_001
         else:
-            slide_name = "/testing/" + file_list[0]  # test_001
+            slide_name = "testing/" + file_list[0]  # test_001
         patch_name = file_list[1]  # 24_181
 
         if self.pseudo_label:
@@ -297,9 +297,9 @@ class InssepDataset(WSIDataset):
         file_list = file_list.split('/')[-2:]  # [normal_001,24_18]
 
         if 'train' in tile_dir:
-            slide_name = "/training/" + file_list[0]  # normal_001
+            slide_name = "training/" + file_list[0]  # normal_001
         else:
-            slide_name = "/testing/" + file_list[0]  # test_001
+            slide_name = "testing/" + file_list[0]  # test_001
         patch_name = file_list[1]  # 24_181
 
         if self.pseudo_label:
@@ -463,9 +463,9 @@ class InssepSPLDataset(WSIDataset):
         file_list = file_list.split('/')[-2:]  # [normal_001,24_18]
 
         if 'train' in tile_dir:
-            slide_name = "/training/" + file_list[0]  # normal_001
+            slide_name = "training/" + file_list[0]  # normal_001
         else:
-            slide_name = "/testing/" + file_list[0]  # test_001
+            slide_name = "testing/" + file_list[0]  # test_001
         patch_name = file_list[1]  # 24_181
 
         if self.pseudo_label:
@@ -543,76 +543,76 @@ class ToPIL(object):
         return img
 
 # 原代码，三通道
-# def _get_simclr_pipeline_transform():
-#     s = 1
-#     input_shape = (224, 224, 3)
-#     # get a set of data augmentation transformations as described in the SimCLR paper.
-#     color_jitter = transforms.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
-#     data_transforms = transforms.Compose([ToPIL(),
-#                                           transforms.RandomResizedCrop(size=input_shape[0]),
-#                                           transforms.RandomHorizontalFlip(),
-#                                           transforms.RandomApply([color_jitter], p=0.8),
-#                                           transforms.RandomGrayscale(p=0.2),
-#                                           GaussianBlur(kernel_size=int(0.06 * input_shape[0])),
-#                                           transforms.ToTensor()])
-#     return data_transforms
-#
-#
-# def _get_CE_pipeline_transform():
-#     s = 1
-#     input_shape = (224, 224, 3)
-#     # get a set of data augmentation transformations as described in the SimCLR paper.
-#     # color_jitter = transforms.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
-#     data_transforms = transforms.Compose([ToPIL(),
-#                                           transforms.RandomHorizontalFlip(),
-#                                           transforms.RandomGrayscale(p=0.2),
-#                                           GaussianBlur(kernel_size=int(0.06 * input_shape[0])),
-#                                           transforms.ToTensor()])
-#
-#     return data_transforms
-#
-#
-# def _get_weak_pipeline_transform():
-#     s = 1
-#     input_shape = (224, 224, 3)
-#     # get a set of data augmentation transformations as described in the SimCLR paper.
-#     # color_jitter = transforms.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
-#     data_transforms = transforms.Compose([ToPIL(),
-#                                           transforms.RandomHorizontalFlip(),
-#                                           transforms.ToTensor()])
-#
-#     return data_transforms
-
-# 单通道
 def _get_simclr_pipeline_transform():
     s = 1
-    input_shape = (224, 224, 1)
+    input_shape = (224, 224, 3)
     # get a set of data augmentation transformations as described in the SimCLR paper.
-    data_transforms = transforms.Compose([
+    color_jitter = transforms.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
+    data_transforms = transforms.Compose([ToPIL(),
                                           transforms.RandomResizedCrop(size=input_shape[0]),
                                           transforms.RandomHorizontalFlip(),
-                                          transforms.RandomGrayscale(p=1.0),  # 保证图像为灰度图
+                                          transforms.RandomApply([color_jitter], p=0.8),
+                                          transforms.RandomGrayscale(p=0.2),
                                           GaussianBlur(kernel_size=int(0.06 * input_shape[0])),
                                           transforms.ToTensor()])
     return data_transforms
+
 
 def _get_CE_pipeline_transform():
     s = 1
-    input_shape = (224, 224, 1)
+    input_shape = (224, 224, 3)
     # get a set of data augmentation transformations as described in the SimCLR paper.
-    data_transforms = transforms.Compose([
+    # color_jitter = transforms.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
+    data_transforms = transforms.Compose([ToPIL(),
                                           transforms.RandomHorizontalFlip(),
-                                          transforms.RandomGrayscale(p=1.0),  # 保证图像为灰度图
+                                          transforms.RandomGrayscale(p=0.2),
                                           GaussianBlur(kernel_size=int(0.06 * input_shape[0])),
                                           transforms.ToTensor()])
+
     return data_transforms
+
 
 def _get_weak_pipeline_transform():
     s = 1
-    input_shape = (224, 224, 1)
+    input_shape = (224, 224, 3)
     # get a set of data augmentation transformations as described in the SimCLR paper.
-    data_transforms = transforms.Compose([
+    # color_jitter = transforms.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
+    data_transforms = transforms.Compose([ToPIL(),
                                           transforms.RandomHorizontalFlip(),
-                                          transforms.RandomGrayscale(p=1.0),  # 保证图像为灰度图
                                           transforms.ToTensor()])
+
     return data_transforms
+
+# 单通道
+# def _get_simclr_pipeline_transform():
+#     s = 1
+#     input_shape = (224, 224, 1)
+#     # get a set of data augmentation transformations as described in the SimCLR paper.
+#     data_transforms = transforms.Compose([
+#                                           transforms.RandomResizedCrop(size=input_shape[0]),
+#                                           transforms.RandomHorizontalFlip(),
+#                                           transforms.RandomGrayscale(p=1.0),  # 保证图像为灰度图
+#                                           GaussianBlur(kernel_size=int(0.06 * input_shape[0])),
+#                                           transforms.ToTensor()])
+#     return data_transforms
+#
+# def _get_CE_pipeline_transform():
+#     s = 1
+#     input_shape = (224, 224, 1)
+#     # get a set of data augmentation transformations as described in the SimCLR paper.
+#     data_transforms = transforms.Compose([
+#                                           transforms.RandomHorizontalFlip(),
+#                                           transforms.RandomGrayscale(p=1.0),  # 保证图像为灰度图
+#                                           GaussianBlur(kernel_size=int(0.06 * input_shape[0])),
+#                                           transforms.ToTensor()])
+#     return data_transforms
+#
+# def _get_weak_pipeline_transform():
+#     s = 1
+#     input_shape = (224, 224, 1)
+#     # get a set of data augmentation transformations as described in the SimCLR paper.
+#     data_transforms = transforms.Compose([
+#                                           transforms.RandomHorizontalFlip(),
+#                                           transforms.RandomGrayscale(p=1.0),  # 保证图像为灰度图
+#                                           transforms.ToTensor()])
+#     return data_transforms

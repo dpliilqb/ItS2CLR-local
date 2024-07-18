@@ -39,10 +39,10 @@ def main():
     parser.add_argument('--expname', type=str, default='supsimCLR', help='Experiment name: used for comet and save model')
     parser.add_argument('--root_dir', type=str, default='single', help='the root directory for the input data')
 
-    parser.add_argument('--batch_size', type=int, default=512, help='the batch size')
+    parser.add_argument('--batch_size', type=int, default=5, help='the batch size')
 
     parser.add_argument('--posi_batch_ratio', type=float, default=0.5, help='the postive number rate')
-    parser.add_argument('--posi_query_ratio', type=float, default=0.05, help='the postive number rate')
+    parser.add_argument('--posi_query_ratio', type=float, default=0.5, help='the postive number rate')
 
     parser.add_argument('--ro', type=float, default=0.2, help='initial bag ratio')
     parser.add_argument('--ro_neg', type=float, default=0.2, help='initial bag ratio for negtive')
@@ -150,6 +150,14 @@ def main():
                                            pseudo_label=args.pseudo_label_path, threshold=args.threshold,
                                            witness_rate=args.witness_rate, posbag=True,
                                            mask_uncertain_neg=args.mask_uncertain_neg,labelroot=args.labelroot)
+    # pos_dataloader_iterator = iter(train_dataset_pos_full)
+    # try:
+    #     for _ in range(3):  # 尝试获取前三个批次的数据
+    #         batch = next(pos_dataloader_iterator)
+    #         print(f"Batch: {batch}")
+    # except StopIteration:
+    #     print("StopIteration encountered during manual iteration")
+    #     raise
     train_dataset_neg_clean = InssepSPLDataset(args.root_dir, 'dataset/train_bags.txt', transform,
                                                pseudo_label=args.pseudo_label_path, threshold=args.threshold,
                                                witness_rate=args.witness_rate, posbag=False,
@@ -191,7 +199,9 @@ def main():
 
 
 def get_train_validation_data_loaders(train_dataset_pos, train_dataset_neg,  val_dataset, test_dataset, config):
-
+    print("batch_size:", config['batch_size'])
+    print("posi_batch_ratio:", config['posi_batch_ratio'])
+    print("posi_query_ratio:", config['posi_query_ratio'])
 
     train_loader_pos = DataLoader(train_dataset_pos, batch_size=int(config['batch_size']*config['posi_query_ratio']),
                               num_workers=config['dataset']['num_workers'], drop_last=True, shuffle=True)
@@ -206,8 +216,17 @@ def get_train_validation_data_loaders(train_dataset_pos, train_dataset_neg,  val
 
 def get_train_validation_data_loaders_SPL(train_dataset_pos_full, train_dataset_neg_clean, config):
 
+
     train_loader_pos_full = DataLoader(train_dataset_pos_full, batch_size=int(config['batch_size']*config['posi_batch_ratio']),
                               num_workers=config['dataset']['num_workers'], drop_last=True, shuffle=True)
+    # pos_dataloader_iterator = iter(train_loader_pos_full)
+    # try:
+    #     for _ in range(3):  # 尝试获取前三个批次的数据
+    #         batch = next(pos_dataloader_iterator)
+    #         print(f"Batch: {batch}")
+    # except StopIteration:
+    #     print("StopIteration encountered during manual iteration")
+    #     raise
     train_loader_neg_clean = DataLoader(train_dataset_neg_clean, batch_size=int(config['batch_size']*(1-config['posi_batch_ratio'])),
                               num_workers=config['dataset']['num_workers'], drop_last=True, shuffle=True)
 

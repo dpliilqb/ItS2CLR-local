@@ -8,6 +8,7 @@ import pandas as pd
 import argparse
 from torch.utils.data import DataLoader
 
+
 def str2bool(v):
     """Convert string to boolean value"""
     if isinstance(v, bool):
@@ -76,7 +77,7 @@ def main():
 
 
     parser.add_argument('--witness_rate', type=float, default=None, help='witness_rate for the dataset')
-    parser.add_argument('--epochs', type=int, default=20, help='epoch to train the sup simCLR')
+    parser.add_argument('--epochs', type=int, default=10, help='epoch to train the sup simCLR')
 
 
     # MIL training
@@ -187,6 +188,7 @@ def main():
         project_name="mil",
         workspace=args.workspace,
     )
+
 
     experiment.set_name(args.expname)
 

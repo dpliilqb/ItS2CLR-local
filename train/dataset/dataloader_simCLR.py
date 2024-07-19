@@ -354,8 +354,6 @@ class InssepSPLDataset(WSIDataset):
             self.train_stat = False
         self.gt_label = pickle.load(open(gt_path, 'rb'))
 
-
-
     def init_bag(self):
         self.tiles = []
         self.instance_confidence = []

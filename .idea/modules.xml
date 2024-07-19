@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/dsmil-wsi.iml" filepath="$PROJECT_DIR$/.idea/dsmil-wsi.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ItS2CLR-local.iml" filepath="$PROJECT_DIR$/.idea/ItS2CLR-local.iml" />
     </modules>
   </component>
 </project>

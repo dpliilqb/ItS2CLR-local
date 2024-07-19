@@ -527,7 +527,7 @@ class SimCLR(object):
 
         # use for the neg-neg as positive pairs in the inital training
         for epoch_counter in range(self.config['epochs']):
-            print("Epoch {}/{}, main train".format(epoch_counter, self.config['epochs']))
+            print("Epoch {}/{}, main train".format(epoch_counter+1, self.config['epochs']))
             pos_dataloader_iterator = iter(self.train_loader_pos_full)
             # print(len(self.train_loader_pos_full.dataset))
             # print(pos_dataloader_iterator.__next__())

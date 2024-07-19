@@ -8,6 +8,7 @@ from collections import defaultdict
 import torchvision.transforms as transforms
 import pickle
 
+# Whole slide images
 class WSIDataset(Dataset):
     def __init__(self, root_dir, bag_names_file, transform, witness_rate=None, labelroot=None):
         self.transform = transform
@@ -396,7 +397,7 @@ class InssepSPLDataset(WSIDataset):
                             if self.pseudo_label[k.strip('/')][v.split('.')[0]] <= self.threshold:
                                 # self.tiles.append(k + v)
                                 self.instance_confidence.append(self.pseudo_label[k.strip('/')][v.split('.')[0]])
-
+                #tiles: 全neg
                 if not "pos" in k:
                     for v in vs:
                         self.tiles.append(k + v)

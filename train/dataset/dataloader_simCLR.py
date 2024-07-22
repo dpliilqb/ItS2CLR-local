@@ -115,7 +115,7 @@ class WSIDataset(Dataset):
         image = Image.fromarray(image)
         # print("get_data successfully")
         return image
-
+#用于instance特征提取
 class SSLDataset(WSIDataset):
     def __init__(self, root_dir, bag_names_file, transform, witness_rate=None,labelroot=None):
         super().__init__(root_dir, bag_names_file, transform, witness_rate,labelroot)

@@ -22,7 +22,7 @@ class ResNetSimCLR(nn.Module):
                             nn.ReLU(), nn.Linear(dim_mlp, out_dim))
 
         self.freeze_extractor = freeze_extractor
-        if  self.freeze_extractor:
+        if self.freeze_extractor:
             for name, param in self.resnet.named_parameters():
                 print(name)
                 if "fc" not in name:

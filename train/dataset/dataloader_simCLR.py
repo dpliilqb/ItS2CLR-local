@@ -16,7 +16,8 @@ class WSIDataset(Dataset):
         self.bag_names = self._load_bag_name(bag_names_file)
         # self.bag2tiles = {b: os.listdir(root_dir + '/' + b)
         #                   for b in self.bag_names}
-        self.bag2tiles = {}
+        self.bag2tiles = {}  #数据集中的所有包和实例
+
         for b in self.bag_names:
             bag_dir = os.path.join(self.root_dir, b.strip('/'))
             bag_dir = os.path.normpath(bag_dir)
@@ -27,8 +28,8 @@ class WSIDataset(Dataset):
         #                   for b in self.bag_names}
 
         self.labelroot = labelroot
-        self.ins_gt = self._load_ins_gt()
-        self.witness_rate = witness_rate
+        self.ins_gt = self._load_ins_gt() #所有数据集的伪标签
+        self.witness_rate = witness_rate #缩小负实例的比例
         if witness_rate:
             self._sample_bag(witness_rate)
         self._compute_avg_wr()
@@ -45,11 +46,14 @@ class WSIDataset(Dataset):
         np.random.seed(2021)
         self.bag_ratio = {}
         for k, v in self.bag2tiles.items():
+            #所有实例的伪标签
             tile_gts = np.array([self.ins_gt["/" + k.strip("/")][tile.strip(".png")] for tile in v]).astype('bool')
+            #正实例的数量
             pos_tiles = tile_gts.sum()
             neg_tiles = len(tile_gts) - pos_tiles
             self.bag_ratio[k] = [neg_tiles, pos_tiles]
             tile_list = np.array(v)
+            #根据witness值选取部分负实例，与所有正实例拼接
             if witness_rate < 1:
                 if pos_tiles > 0:
                     self.bag2tiles[k] = np.concatenate(
@@ -139,6 +143,7 @@ class InsDataset(WSIDataset):
     def __init__(self, root_dir, bag_names_file, transform, pseudo_label=None, threshold=0.7, witness_rate=None,
                  labelroot=None):
         super().__init__(root_dir, bag_names_file, transform, witness_rate, labelroot)
+        #所有数据集中的包和实例
         self.tiles = sum([[k + v for v in vs] for k, vs in self.bag2tiles.items()], [])
 
         if 'train' in bag_names_file or 'val' in bag_names_file:
@@ -147,9 +152,11 @@ class InsDataset(WSIDataset):
         else:
             gt_path = labelroot + '/annotation/gt_ins_labels_test.p'
             self.train_stat = False
+        #所有的真实标签
         self.gt_label = pickle.load(open(gt_path, 'rb'))
 
         if pseudo_label:
+            #所有生成的伪标签
             self.pseudo_label = pickle.load(open(pseudo_label, 'rb'))
         else:
             self.pseudo_label = None
@@ -210,6 +217,7 @@ class InsDataset(WSIDataset):
                 [self.gt_label[slide_name][patch_name]]), slide_name, patch_name
 
 # separte the postive bag and the negative bag:
+#仅用于所有正实例数据集train_dataset_pos_full
 class InssepDataset(WSIDataset):
     def __init__(self, root_dir, bag_names_file, transform, pseudo_label=None, threshold=0.7, witness_rate=None,
                  posbag=True, mask_uncertain_neg=True, labelroot=None):
@@ -247,20 +255,24 @@ class InssepDataset(WSIDataset):
             for k, vs in self.bag2tiles.items():
                 self.pseudo_label[k.strip('/')] = self.pseudo_label.pop(k.strip(('/')))
         if self.posbag == True:
+            #正数据集
             for k, vs in self.bag2tiles.items():
                 if "pos" in k:
                     for v in vs:
                         if self.pseudo_label[k.strip('/')][v.split('.')[0]] > self.threshold:
                             self.tiles.append(k + v)
+                            #正包中所有大于threshold的实例（被认为正实例）
         else:
+            #非正数据集（负数据集）
             for k, vs in self.bag2tiles.items():
                 if not self.mask_uncertain_neg:
                     if "pos" in k:
                         for v in vs:
                             if self.pseudo_label[k.strip('/')][v.split('.')[0]] <= self.threshold:
                                 self.tiles.append(k + v)
-
+                            #正包中所有小于threshold的实例，被认为负实例
                 if not "pos" in k:
+                    #所有负包中的实例
                     for v in vs:
                         self.tiles.append(k + v)
 
@@ -362,6 +374,7 @@ class InssepSPLDataset(WSIDataset):
             for k, vs in self.bag2tiles.items():
                 self.pseudo_label[k.strip('/')] = self.pseudo_label.pop(k.strip(('/')))
         if self.posbag == True:
+            #如果被标记为正数据集
             for k, vs in self.bag2tiles.items():
                 if "pos" in k:
                     for v in vs:
@@ -373,9 +386,11 @@ class InssepSPLDataset(WSIDataset):
                         if self.pseudo_label[k.strip('/')][v.split('.')[0]] > self.threshold:
                             # self.tiles.append(k + v)
                             self.instance_confidence.append(self.pseudo_label[k.strip('/')][v.split('.')[0]])
+                            #正包里所有的大于旧threshold，被认为是正实例的值
             # print(self.instance_confidence)
             # print(1 - self.ratio)
             threshold_new = np.quantile(self.instance_confidence, 1 - self.ratio)
+            #(1-ratio)是上分位数，选取大于这个分位区间的值
             # print(threshold_new)
 
             for k, vs in self.bag2tiles.items():
@@ -388,8 +403,11 @@ class InssepSPLDataset(WSIDataset):
 
                         if self.pseudo_label[k.strip('/')][v.split('.')[0]] >= threshold_new:
                             self.tiles.append(k + v)
+                            #更新threshold后，选取出来的上(1-ratio)%的实例被认作正实例
+                            # tiles:数据集里所有的被认为是正的实例
 
         else:
+            #如果未被标记为正数据集（负数据集）
             for k, vs in self.bag2tiles.items():
                 if not self.mask_uncertain_neg:
                     if "pos" in k:
@@ -405,6 +423,7 @@ class InssepSPLDataset(WSIDataset):
             if not len(self.instance_confidence) == 0:
                 if not self.mask_uncertain_neg:
                     threshold_new = np.quantile(self.instance_confidence, self.ratio)
+                    #根据ratio%选取正包中被认为是负实例的实例
                     for k, vs in self.bag2tiles.items():
                         if "pos" in k:
                             for v in vs:

@@ -151,20 +151,13 @@ def main():
                                            pseudo_label=args.pseudo_label_path, threshold=args.threshold,
                                            witness_rate=args.witness_rate, posbag=True,
                                            mask_uncertain_neg=args.mask_uncertain_neg,labelroot=args.labelroot)
-    # pos_dataloader_iterator = iter(train_dataset_pos_full)
-    # try:
-    #     for _ in range(3):  # 尝试获取前三个批次的数据
-    #         batch = next(pos_dataloader_iterator)
-    #         print(f"Batch: {batch}")
-    # except StopIteration:
-    #     print("StopIteration encountered during manual iteration")
-    #     raise
+
     train_dataset_neg_clean = InssepSPLDataset(args.root_dir, 'dataset/train_bags.txt', transform,
                                                pseudo_label=args.pseudo_label_path, threshold=args.threshold,
                                                witness_rate=args.witness_rate, posbag=False,
                                                mask_uncertain_neg=args.mask_uncertain_neg, ratio=0, use_ema=args.use_ema,
                                                labelroot=args.labelroot)
-    # print("All training set loaded!")
+
     val_dataset = InsDataset(args.root_dir, 'dataset/val_bags.txt', transform,
                              pseudo_label=args.pseudo_label_path, threshold=args.threshold, witness_rate=args.witness_rate,
                              labelroot=args.labelroot)

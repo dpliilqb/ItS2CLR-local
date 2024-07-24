@@ -478,6 +478,7 @@ class SimCLR(object):
         model = ResNetSimCLR(**self.config["model"])  # .to(self.device)
         model = self._load_pre_trained_weights(model)
         if self.config['n_gpu'] > 1:
+
             device_n = len(eval(self.config['gpu_ids']))
             print("GPU is:", device_n)
             model = torch.nn.DataParallel(model, device_ids=range(device_n))

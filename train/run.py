@@ -136,11 +136,13 @@ def main():
         transform = _get_weak_pipeline_transform()
         print('weak transform')
 
+    # 支持self-paced的正实例集，只会返回正包里指定范围内最有信心被认为正实例的
     train_dataset_pos = InssepSPLDataset(args.root_dir, 'dataset/train_bags.txt', transform,
                                          pseudo_label=args.pseudo_label_path, threshold=args.threshold,
                                          witness_rate=args.witness_rate, posbag=True,
                                          mask_uncertain_neg=args.mask_uncertain_neg, ratio=args.ro, use_ema=args.use_ema,
                                          labelroot=args.labelroot)
+    #支持self-paced的负实例集，返回正包里最有信心被认为负实例的和负包里的实例
     train_dataset_neg = InssepSPLDataset(args.root_dir, 'dataset/train_bags.txt', transform,
                                          pseudo_label=args.pseudo_label_path, threshold=args.threshold,
                                          witness_rate=args.witness_rate, posbag=False,

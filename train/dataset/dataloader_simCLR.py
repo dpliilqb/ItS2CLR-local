@@ -14,8 +14,6 @@ class WSIDataset(Dataset):
         self.transform = transform
         self.root_dir = root_dir
         self.bag_names = self._load_bag_name(bag_names_file)
-        # self.bag2tiles = {b: os.listdir(root_dir + '/' + b)
-        #                   for b in self.bag_names}
         self.bag2tiles = {}  #数据集中的所有包和实例
 
         for b in self.bag_names:
@@ -24,16 +22,12 @@ class WSIDataset(Dataset):
             images = os.listdir(bag_dir)
             self.bag2tiles[b] = images
 
-        # self.bag2tiles = {b: os.listdir(root_dir + b)
-        #                   for b in self.bag_names}
-
         self.labelroot = labelroot
         self.ins_gt = self._load_ins_gt() #所有数据集的伪标签
         self.witness_rate = witness_rate #缩小负实例的比例
         if witness_rate:
             self._sample_bag(witness_rate)
         self._compute_avg_wr()
-
 
     def _load_ins_gt(self):
         ins_gt_dir = self.labelroot + "/annotation/"

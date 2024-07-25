@@ -23,7 +23,7 @@ class WSIDataset(Dataset):
             self.bag2tiles[b] = images
 
         self.labelroot = labelroot
-        self.ins_gt = self._load_ins_gt() #所有数据集的伪标签
+        self.ins_gt = self._load_ins_gt() #所有数据集的真实标签
         self.witness_rate = witness_rate #缩小负实例的比例
         if witness_rate:
             self._sample_bag(witness_rate)

@@ -49,7 +49,7 @@ def main():
     parser.add_argument('--ro_neg', type=float, default=0.2, help='initial bag ratio for negtive')
 
     parser.add_argument('--rT', type=float, default=0.8, help='final bag ratio')
-    parser.add_argument('--warmup', type=int, default=5, help='warmup epoch before SPL')
+    parser.add_argument('--warmup', type=int, default=3, help='warmup epoch before SPL')
     parser.add_argument('--init_MIL_training', type=str2bool, default=True, help='conduct MIL training in the begining')
 
     parser.add_argument('--use_ema', type=str2bool, default=False, help='use EMA as the pseudo label, we did not use it')

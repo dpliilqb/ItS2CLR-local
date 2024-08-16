@@ -1,4 +1,0 @@
-/testing/test_1/
-/testing/test_2/
-/testing/test_3/
-/testing/test_4/

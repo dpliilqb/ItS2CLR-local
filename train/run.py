@@ -40,7 +40,7 @@ def main():
     parser.add_argument('--expname', type=str, default='supsimCLR', help='Experiment name: used for comet and save model')
     parser.add_argument('--root_dir', type=str, default='single', help='the root directory for the input data')
 
-    parser.add_argument('--batch_size', type=int, default=20, help='the batch size')
+    parser.add_argument('--batch_size', type=int, default=10, help='the batch size')
 
     parser.add_argument('--posi_batch_ratio', type=float, default=0.5, help='the postive number rate')
     parser.add_argument('--posi_query_ratio', type=float, default=0.5, help='the postive number rate')

@@ -1,4 +1,0 @@
-/training/tumor_1/
-/training/tumor_2/
-/training/tumor_3/
-/training/normal_1/

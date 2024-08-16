@@ -435,8 +435,12 @@ class InssepSPLDataset(WSIDataset):
         if next(iter(self.pseudo_label)).startswith('/'):
             for k, vs in self.bag2tiles.items():
                 self.pseudo_label[k.strip('/')] = self.pseudo_label.pop(k.strip(('/')))
+        print("..................................................................................................")
+        # print(f"pseudo_label: {self.pseudo_label.keys()}")
+        # print(f"pseudo_label_EMA: {self.pseudo_label_EMA.keys()}")
+        # for slide_name in self.pseudo_label.keys():
+        for slide_name in pseudo_label.keys():
 
-        for slide_name in self.pseudo_label.keys():
             for patch_name in self.pseudo_label[slide_name].keys():
                 self.pseudo_label_EMA[slide_name][patch_name] = 0.3 * self.pseudo_label_EMA[slide_name][patch_name] \
                                                                 + 0.7 * pseudo_label[slide_name][patch_name]

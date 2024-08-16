@@ -1,3 +1,5 @@
+import time
+
 import comet_ml
 from comet_ml import Experiment
 from models.resnet_simclr import ResNetSimCLR
@@ -198,7 +200,7 @@ class SimCLR(object):
         """
         Training steps
         """
-
+        print("Getting projections from ResNet!")
         # get the representations and the projections
         zis_pos = model(xis_pos)  # [N,C]
 
@@ -214,7 +216,7 @@ class SimCLR(object):
 
         # get the representations and the projections
         zjs_neg = model(xjs_neg)  # [N,C]
-
+        print("Got projections from ResNet!")
         # normalize projection feature vectors
         zis_neg = F.normalize(zis_neg, dim=1)
         zjs_neg = F.normalize(zjs_neg, dim=1)
@@ -223,12 +225,12 @@ class SimCLR(object):
         zjs = torch.cat([zjs_neg, zjs_pos])
 
         features = torch.cat([zis.unsqueeze(1), zjs.unsqueeze(1)], dim=1)
-
+        print("Calculating loss function!")
         if pair_mode == 2:
             loss = self.sup_nt_xent_criterion_pair2(features, labels, bag_label)
         else:
             loss = self.sup_nt_xent_criterion_pair1(features, labels, bag_label)
-
+        print("Got loss!")
         return loss
 
     #训练MIL aggregator，更新实例级伪标签
@@ -250,6 +252,10 @@ class SimCLR(object):
 
         bags_list, val_list, test_list = [], [], []
         for b in train_dataset:
+            a = b[1].item()
+            c = b[0].numpy()
+            d = b[2]
+            e = b[3]
             bags_list.append([b[1].item(), b[0].numpy(), b[2], b[3]])
         for b in val_dataset:
             val_list.append([b[1].item(), b[0].numpy(), b[2], b[3]])
@@ -434,8 +440,10 @@ class SimCLR(object):
                 transforms.RandomVerticalFlip(),
                 transforms.ToTensor()
             ]),
-            'val': transforms.Compose([transforms.RandomHorizontalFlip(),
-                                       transforms.ToTensor()])
+            'val': transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor()])
         }
         root_dir = 'single'
 
@@ -459,10 +467,6 @@ class SimCLR(object):
         state_dict_init = net.state_dict()
         new_state_dict = OrderedDict()
 
-        # print(state_dict_weights.keys())
-        # print(len(state_dict_weights.keys()))
-        # print(state_dict_init.keys())
-        # print(len(state_dict_init.keys()))
         for (k, v), (k_0, v_0) in zip(state_dict_weights.items(), state_dict_init.items()):
             name = k_0
             new_state_dict[name] = v
@@ -580,28 +584,34 @@ class SimCLR(object):
                 optimizer.zero_grad()
 
                 label = label.to(self.device)
-
+                # print("Neg-Neg training")
                 # negneg
                 loss_neg_sup = self._step_train(model, xis_pos, xjs_pos, xis_neg, xjs_neg, label, bag_label, n_iter,
                                                 pair_mode=2)
                 loss = loss_neg_sup
-
+                # print("Neg-Neg training finished")
                 if n_iter % self.config['log_every_n_steps'] == 0:
                     self.writer.add_scalar('train_loss', loss, global_step=n_iter)
                     with self.experiment.train():
                         self.experiment.log_metric('train_loss', loss, step=n_iter)
                         self.experiment.log_metric('loss_neg_sup', loss_neg_sup, step=n_iter)
                         # self.experiment.log_metric('loss_glolocal', loss_glolocal, step=n_iter)
-
+                # print("Starting backpropagation!")
                 if apex_support and self.config['fp16_precision']:
                     with amp.scale_loss(loss, optimizer) as scaled_loss:
                         scaled_loss.backward()
                 else:
                     loss.backward()
+                # print("Finished backpropagation!")
+                # print("Starting optimizer!")
                 optimizer.step()
-
+                # print("Optimizer finished!")
+                print("...................................................................")
+                print(f"Starting Pos-Pos training process in Epoch {epoch_counter+1}/{self.config['epochs']}")
+                pos_pos_start = time.time()
                 # after the warmup epochs, add the positive instance as the query instance
                 if epoch_counter >= self.args.warmup:
+                    print("Pos-Pos sampling start!")
                     try:
                         xis_pos, xjs_pos, bag_label_pos, label_pos, gt_label_pos, slide_name_pos, patch_name_pos = next(
                             pos_dataloader_iterator_filtered)
@@ -633,23 +643,36 @@ class SimCLR(object):
 
                     label = label.to(self.device)
                     # pospos
+                    print("Pos-Pos training step start!")
+                    start_time = time.time()
                     loss_pos_sup = self._step_train(model, xis_pos, xjs_pos, xis_neg, xjs_neg, label, bag_label, n_iter,
                                                     pair_mode=1)
+
+
                     loss = loss_pos_sup
 
                     if n_iter % self.config['log_every_n_steps'] == 0:
                         self.writer.add_scalar('train_loss_pair1', loss, global_step=n_iter)
                         with self.experiment.train():
                             self.experiment.log_metric('loss_pos_sup_pair1', loss_pos_sup, step=n_iter)
-
+                    # print("Starting backpropagation!")
                     if apex_support and self.config['fp16_precision']:
                         with amp.scale_loss(loss, optimizer) as scaled_loss:
                             scaled_loss.backward()
                     else:
                         loss.backward()
+                    # print("Finished backpropagation!")
+                    # print("Starting optimizer!")
                     optimizer.step()
-
+                    # print("Optimizer finished!")
+                    end_time = time.time()
+                    cost = end_time - start_time
+                    print(f"Pos-Pos training step finished! Cost {cost:.4f}")
                 n_iter += 1
+                pos_pos_end = time.time()
+                pos_pos_cost = pos_pos_end - pos_pos_start
+                print(f"Finishing Pos-Pos training process in Epoch {epoch_counter+1}/{self.config['epochs']},"
+                      f" cost {pos_pos_cost:.4f}")
 
             saving_state = {
                 'net': model.state_dict(),
